@@ -4,7 +4,6 @@ import requests
 from jose import jwt, JWTError
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
 KEYCLOAK_URL = os.getenv("KEYCLOAK_SERVER")
@@ -12,7 +11,6 @@ REALM = os.getenv("KEYCLOAK_REALM", "demo")
 ALGO = "RS256"
 AUDIENCE = os.getenv("KEYCLOAK_CLIENT_ID", "api-backend")
 
-# Fetch JWKS with retry
 def fetch_jwks(retries=10, delay=3):
     jwks_url = f"{KEYCLOAK_URL}/realms/{REALM}/protocol/openid-connect/certs"
     print(f"Fetching JWKS from: {jwks_url}")
@@ -21,7 +19,7 @@ def fetch_jwks(retries=10, delay=3):
             print(f"Attempt {i + 1} to fetch JWKS...")
             resp = requests.get(jwks_url)
             if resp.status_code == 200:
-                print("✅ JWKS fetched successfully.")
+                print("JWKS fetched successfully.")
                 return resp.json()
             else:
                 print(f"Failed with status: {resp.status_code}")

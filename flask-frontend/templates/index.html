@@ -13,22 +13,45 @@
 </head>
 <body>
   {% if user %}
-    <h2>Welcome, {{ user.preferred_username }}</h2>
-
+    <h2>Welcome, {{ user.preferred_username }}</h2> <a href="/logout">Logout</a>
     {% if user and user.get('realm_access') and 'admin' in user['realm_access'].get('roles', []) %}
       <button onclick="alert('Admin Area')" disabled>Admin Area</button>
     {% endif %}
 
-    <button onclick="showCreateKey()">Create API Key</button>
-    <a href="/logout">Logout</a>
+    
+    <br><br><button onclick="showCreateKey()">Create API Key</button>
 
     <h3>Issued API Keys</h3>
     <table id="keysTable">
-      <thead><tr><th>Client ID</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Client ID</th><th>Secret</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
 
     <div id="output"><pre></pre></div>
+
+    <h3>Manage Roles</h3>
+    <button onclick="createRole()">+ New Role</button>
+    <br>
+    <select id="rolesDrop"></select>
+    <select id="usersDrop"></select>
+    <button onclick="assign()">Assign Role</button>
+
+    <h3>Add New User</h3>
+    <input id="newUsername" placeholder="Username">
+    <input id="newEmail" placeholder="Email">
+    <input id="newPassword" placeholder="Password" type="password">
+    <button onclick="addUser()">Create User</button>
+
+
+    <div>
+      <h4>Existing Users</h4>
+      <table id="usersTable">
+        <thead>
+          <tr><th>Username</th><th>User ID</th><th>Roles</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
   {% else %}
     <a href="/login">Login</a>
@@ -48,11 +71,25 @@
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${k.id}</td>
+        <td>
+          <span id="secret-${k.id}" onclick="toggleSecret('${k.id}', '${k.secret}')">
+            [Show]
+          </span>
+        </td>
         <td><button onclick="revokeKey('${k.id}')">Revoke</button></td>
       `;
       tbody.appendChild(row);
     });
   }
+
+  function toggleSecret(id, secret) {
+  const el = document.getElementById(`secret-${id}`);
+  if (el.textContent === "[Show]") {
+    el.textContent = secret;
+  } else {
+    el.textContent = "[Show]";
+  }
+}
 
   async function showCreateKey() {
     alert("Access Token:\n\n" + token);
@@ -82,7 +119,67 @@
     refreshKeys();
   }
 
-  // initial load
   refreshKeys();
+
+async function loadRoles() {
+  const r = await fetch("http://localhost:8000/admin/roles", {
+    headers: {Authorization: `Bearer ${token}`}});
+  const data = await r.json();
+  const sel = document.getElementById("rolesDrop");
+  sel.innerHTML = data.roles.map(r => `<option>${r}</option>`).join("");
+}
+async function loadUsersList() {
+  const r = await fetch("http://localhost:8000/admin/users", {
+    headers: {Authorization: `Bearer ${token}`}});
+  const data = await r.json();
+  const sel = document.getElementById("usersDrop");
+  sel.innerHTML = data.users.map(u => `<option value="${u.id}">${u.username}</option>`).join("");
+}
+async function createRole(){
+  const name = prompt("Role name?");
+  await fetch(`http://localhost:8000/admin/roles?name=${name}`, {
+    method: "POST", headers:{Authorization: `Bearer ${token}`}});
+  loadRoles();
+}
+async function assign(){
+  const uid = document.getElementById("usersDrop").value;
+  const rn = document.getElementById("rolesDrop").value;
+  await fetch(`http://localhost:8000/admin/roles/assign?user_id=${uid}&role_name=${rn}`, {
+    method: "POST", headers:{Authorization: `Bearer ${token}`}});
+  alert("Assigned");
+}
+async function addUser() {
+  const username = document.getElementById("newUsername").value;
+  const email = document.getElementById("newEmail").value;
+  const password = document.getElementById("newPassword").value;
+
+  const res = await fetch(`http://localhost:8000/admin/users?username=${username}&email=${email}&password=${password}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  alert("User created: " + JSON.stringify(data));
+  loadUsers(); 
+  loadUsersList();
+}
+
+ async function loadUsers() {
+    const base = "http://localhost:8000";
+    const res = await fetch(`${base}/admin/users`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const { users } = await res.json();
+    const tbody = document.querySelector("#usersTable tbody");
+    tbody.innerHTML = users.map(u =>
+      `<tr>
+         <td>${u.username}</td>
+         <td>${u.id}</td>
+         <td>${u.roles.join(", ")}</td>
+       </tr>`
+    ).join("");
+  }
+
+loadRoles(); loadUsersList(); loadUsers();
 </script>
+
 </html>
