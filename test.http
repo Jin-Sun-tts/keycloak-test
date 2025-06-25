@@ -1,0 +1,37 @@
+curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://localhost:8000/protected
+
+###
+
+curl -X POST 'http://localhost:8080/realms/demo/protocol/openid-connect/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-d 'username=admin' \
+-d 'password=admin' \
+-d 'grant_type=password' \
+-d 'client_id=admin-cli'
+
+
+###
+
+curl -X POST http://localhost:8080/realms/demo/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password" \
+  -d "client_id=flask-app" \
+  -d "client_secret=n0Doclymn07ONI49qkhQpasngsRa6HEl" \
+  -d "username=user1" \
+  -d "password=pass"
+
+
+###
+
+  curl -X POST http://localhost:8080/realms/demo/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=user1-mytest-key-6" \
+  -d "client_secret=dCyPhgz76R8f4OBQD61fmgmC15t9TxHH"
+
+
+###
+
+
+  curl http://localhost:8000/protected \
+  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJpTlBHaWxhMGxIS3BNVXFVZlJQS3JTMzBibDNjS3lwRTFFSjNIcnNUYVo0In0.eyJleHAiOjE3NTA4MDIyODcsImlhdCI6MTc1MDc4NDI4NywianRpIjoiYWZlNGNjMzctM2MyZS00OTc5LTk0NjItZDA1ZDU1ODFlMDQ3IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9kZW1vIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImUyZDY0MThiLTkwYmYtNDFiOS04YmQxLWU2NDMyZTIyNjRlNCIsInR5cCI6IkJlYXJlciIsImF6cCI6InVzZXIxLW15dGVzdC1rZXktNiIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJkZWZhdWx0LXJvbGVzLWRlbW8iLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoiZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SG9zdCI6IjE3Mi4yNS4wLjEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtdXNlcjEtbXl0ZXN0LWtleS02IiwiY2xpZW50QWRkcmVzcyI6IjE3Mi4yNS4wLjEiLCJjbGllbnRfaWQiOiJ1c2VyMS1teXRlc3Qta2V5LTYifQ.i1yNkxzIJ3p-9997d3OVH3l3U1WIlxoFUgQHKsA625VomqtUOH505g6Na4GtGDH39StuKeAesosZfhCxMSmndPUwuMFwtICUtVGarfqc4h4jNhiS7XFazPQwQrbEC3rPlQEFoyOeJ6PdZ5aMZQOLV17XZjC-RhUisYgLW1ldKMmvEAjiP7su36gBXnGbfRop1ImrR8jkt5NU0s_3cfTiPP0AB2QU18Ep3t2nyAzsECdcfODNqT_NvoSQexTY4zrKZeTxYUdjEaBSqFLSwTI8k_xneuMMcBk09IHUTxDTTfvsU0MhXw0rzfYHZiLy0u7-MYC-vvxboN_oJtOpgfYUUw"
