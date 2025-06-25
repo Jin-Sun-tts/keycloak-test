@@ -48,6 +48,7 @@ def auth_callback():
     session["user"] = token.get("userinfo") or {}  # Optional: request userinfo endpoint
     session["access_token"] = access_token
     session["id_token"] = id_token
+    print(access_token)
     return redirect("/")
 
 @app.route("/logout")
