@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <title>API Key Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    button { margin: 5px; }
+    pre { background: #f4f4f4; padding: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  {% if user %}
+    <h2>Welcome, {{ user.preferred_username }}</h2>
+
+    {% if user and user.get('realm_access') and 'admin' in user['realm_access'].get('roles', []) %}
+      <button onclick="alert('Admin Area')" disabled>Admin Area</button>
+    {% endif %}
+
+    <button onclick="showCreateKey()">Create API Key</button>
+    <a href="/logout">Logout</a>
+
+    <h3>Issued API Keys</h3>
+    <table id="keysTable">
+      <thead><tr><th>Client ID</th><th>Actions</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="output"><pre></pre></div>
+
+  {% else %}
+    <a href="/login">Login</a>
+  {% endif %}
+</body>
+
+<script>
+  const api = "http://localhost:8000/keys";
+  const token = "{{ session['access_token'] }}";
+
+  async function refreshKeys() {
+    const res = await fetch(api, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const tbody = document.querySelector("#keysTable tbody");
+    tbody.innerHTML = "";
+    (data.keys || []).forEach(k => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${k.id}</td>
+        <td><button onclick="revokeKey('${k.id}')">Revoke</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  async function showCreateKey() {
+    alert("Access Token:\n\n" + token);
+    const name = prompt("Enter key name:");
+    if (!name) return;
+    const roles = prompt("Comma-separated roles (e.g. api-client):", "api-client").split(",");
+    const res = await fetch(api, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, roles })
+    });
+    const data = await res.json();
+    document.getElementById("output").querySelector("pre").textContent = JSON.stringify(data, null, 2);
+    refreshKeys();
+  }
+
+  async function revokeKey(id) {
+    const res = await fetch(`${api}/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    document.getElementById("output").querySelector("pre").textContent = JSON.stringify(data, null, 2);
+    refreshKeys();
+  }
+
+  // initial load
+  refreshKeys();
+</script>
+</html>

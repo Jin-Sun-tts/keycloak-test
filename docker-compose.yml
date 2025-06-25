@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    environment:
+      KC_DB: dev-file
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    # command: start-dev --import-realm
+    volumes:
+      - ./keycloak/import-realm.json:/opt/keycloak/data/import/import-realm.json
+      - keycloak_data:/opt/keycloak/data
+    ports:
+      - "8080:8080"
+
+  # flask:
+  #   build: ./flask-frontend
+  #   environment:
+  #     FLASK_ENV: development
+  #     KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+  #     KEYCLOAK_EXTERNAL_URL: http://localhost:8080
+  #     KEYCLOAK_REALM: demo
+  #     KEYCLOAK_CLIENT_ID: flask-app
+  #     KEYCLOAK_CLIENT_SECRET: n0Doclymn07ONI49qkhQpasngsRa6HEl
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - keycloak
+
+  # fastapi:
+  #   build: ./fastapi-backend
+  #   environment:
+  #     KEYCLOAK_SERVER: http://keycloak:8080
+  #     KEYCLOAK_REALM: demo
+  #     KEYCLOAK_CLIENT_ID: api-backend
+  #     KEYCLOAK_CLIENT_SECRET: jNHX6ygaUB7Oc5dkGZw6ylLUnESMbclG
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - keycloak
+
+volumes:
+  keycloak_data:
