@@ -1,0 +1,29 @@
+{
+  "realm": "demo",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "flask-app",
+      "secret": "CHANGE_ME",
+      "protocol": "openid-connect",
+      "redirectUris": ["http://localhost:5000/auth/callback"],
+      "webOrigins": ["http://localhost:5000"]
+    },
+    {
+      "clientId": "api-backend",
+      "secret": "CHANGE_ME",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "publicClient": false
+    }
+  ],
+  "users": [
+    {
+      "username": "user1",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "pass", "temporary": false }]
+    }
+  ],
+  "roles": { "realm": [] }
+}

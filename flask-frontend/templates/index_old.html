@@ -1,0 +1,25 @@
+<!doctype html>
+<title>Console</title>
+<h1>{% if user %}Welcome, {{ user.name }}{% else %}Hello Visitor{% endif %}</h1>
+<button onclick="callAPI()">Call Protected API</button>
+<div>
+  {% if user %}
+    <script>
+        async function callAPI() {
+            const res = await fetch("http://localhost:8000/protected", {
+            headers: {
+                Authorization: "Bearer {{ session['token']['access_token'] }}"
+            }
+            });
+            const json = await res.json();
+            console.log(json);
+            alert(JSON.stringify(json, null, 2));
+        }
+    </script>
+     <!-- <pre>{{ session['token']['access_token'] }}</pre> -->
+    <a href="/logout">Logout</a>
+  {% else %}
+    <a href="/login">Login</a>
+  {% endif %}
+ 
+</div>
