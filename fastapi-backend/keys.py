@@ -11,8 +11,6 @@ def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer)):
 
 @router.get("/")
 async def list_keys(user=Depends(get_current_user)):
-    # if "admin" in user.get("realm_access", {}).get("roles", []):
-    #     return {"keys": list_api_keys(owner_prefix="")}
     prefix = user["preferred_username"]
     keys = list_api_keys(owner_prefix=prefix)
     return {"keys": keys}
